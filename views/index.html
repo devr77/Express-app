@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Product Auto-Suggest</title>
+  <style>
+    input { width: 300px; padding: 8px; }
+    ul { list-style: none; padding: 0; margin: 4px 0; }
+    li { padding: 6px; border: 1px solid #ccc; cursor: pointer; }
+    li:hover { background-color: #f0f0f0; }
+  </style>
+</head>
+<body>
+  <h2>Search Product</h2>
+  <input type="text" id="search" placeholder="Type product name...">
+  <ul id="suggestions"></ul>
+
+  <script>
+    const input = document.getElementById("search");
+    const list = document.getElementById("suggestions");
+
+    input.addEventListener("input", async () => {
+      const query = input.value.trim();
+      if (!query) {
+        list.innerHTML = "";
+        return;
+      }
+
+      const res = await fetch(`/products/suggest?q=${encodeURIComponent(query)}`);
+      const suggestions = await res.json();
+
+      list.innerHTML = suggestions.map(name => `<li>${name}</li>`).join("");
+    });
+
+    list.addEventListener("click", e => {
+      if (e.target.tagName === "LI") {
+        input.value = e.target.textContent;
+        list.innerHTML = "";
+      }
+    });
+  </script>
+</body>
+</html>
